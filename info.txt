@@ -1,0 +1,34 @@
+El 'admin' crea y elimina a los 'admin', 'users' ,  crea las categorias y los productos.
+El 'admin' es creado por directamente en la bbdd.
+Los 'users' solo pueden crear y eliminar los productos.
+
+Rutas:
+// para login
+.get('/auth') => req.body({email y password}) : devuelve token y objeto data{ username , isAdmin}
+
+
+// rutas protegidas con sesion
+.get('/users') => if(isAdmin) : => devuelve lista de usuarios solo si el usuario es Admin
+.get('/users/username') => req.params.username : devuelve los datos propios del usuario logeado
+
+.put('/users') => req.body({username, passsword, newPassword}) : actualiza los datos del usuario actual
+
+.delete('/users') => if(isAdmin)=> req.body({userId}) : admin elimina el usuario con el userId dado en el req.body.userId 
+
+// para crear un nuevo usuario
+.post('/users')=> req.body({username, email, password, roles['admin' || 'user']}) : devuelve status "OK"
+
+La autenticacion se hace por la cookie.access-token creada en api/auth/login
+
+access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MzAyNGVjMzRiNzdjZGE3ZjY2ODlkNiIsImlhdCI6MTY4NDQxNDg0MiwiZXhwIjoxNjg0NDE4NDQyfQ.8KdWo_w-ygLuoytH2I8x79chLEaRcy64qiBnGTX5gqg; Path=/; HttpOnly; Expires=Thu, 18 May 2023 14:00:42 GMT;
+
+
+.get('/products')  => devuelve lista de todos los productos
+
+.get('/products?search=value') => retorna resultado para nombre de producto == value
+
+.get('/products?query=value') => retorna query  e.g. .get(http://localhost:5000/api/products?price[gte]=1.5&sort=price&fields=name,price,-description,-createdAt&page=2&limit=10)
+
+.get('/products/category/:categoryName') => retorna todos los productos de la categoria pasada como parametro
+
+.post('/auth/forgotPassword') => envia el email del usuario para resetear la contraseña.

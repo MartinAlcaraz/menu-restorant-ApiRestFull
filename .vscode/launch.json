@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        // para correr el debbuger que no usa babel-node        
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\src\\index.js"
+        },
+        
+        // para correr el debbuger usando babel-node 
+        // "dev": "cross-env NODE_ENV=development nodemon ./src/index.js --exec babel-node",
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch with Babel",
+            "program": "${workspaceFolder}\\src\\index.js",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/babel-node"
+        }
+    ]
+}
