@@ -29,6 +29,7 @@
     "@babel/core": "^7.21.3",
     "@babel/node": "^7.20.7",
     "@babel/preset-env": "^7.20.2",
+    "babel-cli": "^6.26.0",
     "nodemon": "^2.0.22"
   }
 }
