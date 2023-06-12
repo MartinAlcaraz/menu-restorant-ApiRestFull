@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import Rol from "../models/Rol.js"
 import createToken from "../Utils/createToken.js";
 import asyncErrorHandler from "../Utils/asyncErrorHandler.js";
-import transporter from "../Utils/email.js";
+import mail from "../Utils/email.js";
 import crypto from 'crypto';
 
 const authCtrl = {};
@@ -58,7 +58,7 @@ authCtrl.forgotPassword = async (req, res, next) => {
 
         await user.save({ validateBeforeSave: false });
 
-        // send Email
+        //    send Email      //
         const resetURL = `${req.protocol}://${req.get('host')}/api/auth/resetPassword/${resetToken}`;
 
         const message = `We have recieved a password reset request. 
@@ -66,18 +66,19 @@ authCtrl.forgotPassword = async (req, res, next) => {
             This reset password link will be available only for 10 minutes.`;
 
         try {
-            await transporter.sendEmail({
+            const mailOptions = {
                 from: "RestoMartinMenuOnline support<alcarazangelmartin@gmail.com>",
-                // to: user.email,
+                // to: user.email, // <====
                 to: "martincho_cqc@hotmail.com",
                 subject: "Password reset request",
                 text: message,
                 html: `
-                <p>We have recieved a password reset request. Please use the link below to reset the password.</p>
-                <a href="${resetURL}">Reset Password</a>
-                <p>This reset password link will be available only for 10 minutes.</p>
-                `
-            });
+                    <p>We have recieved a password reset request. Please use the link below to reset the password.</p>
+                    <a href="${resetURL}">Reset Password</a>
+                    <p>This reset password link will be available only for 10 minutes.</p>
+                    `
+            }
+            await mail.sendMail(mailOptions);
 
             return res.status(200).json({ status: "OK", message: "Password reset link send to the user email." });
 
@@ -86,6 +87,7 @@ authCtrl.forgotPassword = async (req, res, next) => {
             user.passwordResetExpires = undefined;
             await user.save({ validateBeforeSave: false });
 
+            console.log("err", err);
             return res.status(500).json({ status: "FAILED", message: "There was a problem with the reset password email. Try again later." });
         }
 
