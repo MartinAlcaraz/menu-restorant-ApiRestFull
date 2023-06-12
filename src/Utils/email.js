@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 });
 
 transporter.verify().then(() => {
-    console.log("Nodemailer connnected.")
+    console.log("Nodemailer connected.")
 });
 
 module.exports = transporter;

@@ -15,6 +15,7 @@ productsCtrl.queryBestProducts = asyncErrorHandler(async (req, res, next) => {
     next();
 });
 
+// retorna los productos de la categoria pasada por id
 productsCtrl.getProductsOfCategory = asyncErrorHandler(async (req, res, next) => {
 
     const category = await Category.findOne({name: {$regex: `^${req.params.categoryName}$` , $options: 'i'}});

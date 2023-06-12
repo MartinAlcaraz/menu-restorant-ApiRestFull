@@ -2,26 +2,30 @@ El 'admin' crea y elimina a los 'admin', 'users' ,  crea las categorias y los pr
 El 'admin' es creado por directamente en la bbdd.
 Los 'users' solo pueden crear y eliminar los productos.
 
-Rutas:
+*********  Rutas /auth/  *********
 // para login
-.get('/auth') => req.body({email y password}) : devuelve token y objeto data{ username , isAdmin}
+.post('/auth/login') => req.body({email y password}) : devuelve token y objeto data{ username , isAdmin}
 
+.post('/auth/logout') => logOut
 
-// rutas protegidas con sesion
-.get('/users') => if(isAdmin) : => devuelve lista de usuarios solo si el usuario es Admin
-.get('/users/username') => req.params.username : devuelve los datos propios del usuario logeado
+.post('/auth/forgotPassword') => envia el email del usuario para resetear la contraseña.
 
-.put('/users') => req.body({username, passsword, newPassword}) : actualiza los datos del usuario actual
+.patch('/auth/resetPassword/:resetToken') => recive el token para resetear la constraseña.
 
-.delete('/users') => if(isAdmin)=> req.body({userId}) : admin elimina el usuario con el userId dado en el req.body.userId 
+*********  Rutas /users/  *********
 
-// para crear un nuevo usuario
+// Crear un nuevo usuario
 .post('/users')=> req.body({username, email, password, roles['admin' || 'user']}) : devuelve status "OK"
 
 La autenticacion se hace por la cookie.access-token creada en api/auth/login
-
 access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MzAyNGVjMzRiNzdjZGE3ZjY2ODlkNiIsImlhdCI6MTY4NDQxNDg0MiwiZXhwIjoxNjg0NDE4NDQyfQ.8KdWo_w-ygLuoytH2I8x79chLEaRcy64qiBnGTX5gqg; Path=/; HttpOnly; Expires=Thu, 18 May 2023 14:00:42 GMT;
 
+.get('/users') => if(isAdmin) : => devuelve lista de usuarios solo si el usuario es Admin
+.get('/users/username') => req.params.username : devuelve los datos propios del usuario logeado
+.put('/users') => req.body({username, passsword, newPassword}) : actualiza los datos del usuario actual
+.delete('/users') => if(isAdmin)=> req.body({userId}) : admin elimina el usuario con el userId dado en el req.body.userId 
+
+*********  Rutas /products/  *********
 
 .get('/products')  => devuelve lista de todos los productos
 
@@ -31,6 +35,24 @@ access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MzAyNGVjMzRiNzdjZG
 
 .get('/products/category/:categoryName') => retorna todos los productos de la categoria pasada como parametro
 
-.post('/auth/forgotPassword') => envia el email del usuario para resetear la contraseña.
+.post('/products/') => crea nuevo producto
+.get('/products/:productId') => actualiza el producto
+.put('/products/:productId') => crea nuevo producto
+.delete('/products/:productId') => elimina el producto
 
-.patch('/auth/resetPassword/:resetToken') => recive el token para resetear la constraseña.
+.get('/products/stats') => retorna las estadisticas de los productos
+
+.get('/popularProducts') => retorna los productos populares  con una query predefinida
+
+
+*********  Rutas /categories/  *********
+
+.get('/categories')  => devuelve lista de todos las categorias
+.get('/categories/:categoryId')  => devuelve el detalle de la categoria
+.post('/categories/')  => crea nueva categoria
+.put('/categories/:categoryId')  => actualiza de la categoria
+.delete('/categories/:categoryId')  => elimina la categoria y todos los productos de la categoria
+
+
+
+
