@@ -7,7 +7,7 @@ const validateResult = ( req, res, next)=>{
     }catch(err){
         const msg = err.errors.map(val => val.msg);
         const errorMsg = msg.join('. ');
-        res.status(403).json({status: "FAILED", message: errorMsg, details: err.errors});
+        res.status(400).json({status: "FAILED", message: errorMsg, details: err.errors});
     }
 }
 

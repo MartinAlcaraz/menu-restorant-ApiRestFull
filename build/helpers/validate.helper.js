@@ -14,7 +14,7 @@ var validateResult = function validateResult(req, res, next) {
       return val.msg;
     });
     var errorMsg = msg.join('. ');
-    res.status(403).json({
+    res.status(400).json({
       status: "FAILED",
       message: errorMsg,
       details: err.errors
