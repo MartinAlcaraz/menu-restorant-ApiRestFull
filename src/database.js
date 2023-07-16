@@ -1,11 +1,16 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-if(process.env.NODE_ENV == "development") dotenv.config();
+let mongodb_uri;
 
-//dotenv.config();    // borrar
+if(process.env.NODE_ENV == "development") {
+    dotenv.config();
+    mongodb_uri = "mongodb://localhost/TiendaDB";
+}else{
+    // dotenv.config(); // borrar 
+    mongodb_uri= process.env.MONGO_DB_URI;
+}
 
-const mongodb_uri= process.env.MONGO_DB_URI || "mongodb://localhost/TiendaDB";
 mongoose.connect(mongodb_uri)
 .then( (db) =>{console.log("Database is connected to \n" , mongodb_uri) })
 // .catch( (error) => console.log("Error, database is not connected :(  \n", error));

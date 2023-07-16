@@ -30,7 +30,8 @@ app.all('/*', (req, res, next)=>{
     next(err);
 });
 
-// ErrorController => global error handler middleware
+// ErrorController => global error handler middleware 
+// con next(err) arroja un error que es atrapado por ErroController
 app.use(ErrorController);
 
 export default app;

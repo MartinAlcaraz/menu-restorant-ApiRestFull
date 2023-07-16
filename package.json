@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon ./src/index.js --exec babel-node",
     "dev-2": "cross-env NODE_ENV=development babel-node ./src/index.js",
+    "dev3": "cross-env NODE_ENV=production nodemon ./src/index.js --exec babel-node",
     "build": "babel src --out-dir build",
     "start": "cross-env NODE_ENV=production node ./build/index.js"
   },

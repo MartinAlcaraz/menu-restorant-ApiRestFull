@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 var _CustomError = _interopRequireDefault(require("../Utils/CustomError"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-// recive los errores que manda express, por medio del metodo next(error) (errores programados en controladores por ej.) ó 
+// recive los errores que manda express, por medio del metodo " next(error) " (errores programados en controladores por ej.) ó 
 // por otro metodo (por ej. los errores que manda mongoose))
 
 var devError = function devError(res, error) {
@@ -35,9 +35,13 @@ var productionError = function productionError(res, error) {
 var castErrorHandler = function castErrorHandler(error) {
   return new _CustomError["default"]("Invalid value for ".concat(error.path, " : ").concat(error.value), 400);
 };
+
+//errores por nombres existentes en la BBDD.
 var duplicateKeyErrorHandler = function duplicateKeyErrorHandler(error) {
   return new _CustomError["default"]("The name ".concat(error.keyValue.name, " already exists. Use another name."), 400);
 };
+
+//Errores de Mongoose validator
 var validatorErrorHandler = function validatorErrorHandler(error) {
   var msg = Object.values(error.errors).map(function (val) {
     return val.message;
@@ -63,7 +67,7 @@ var _default = function _default(error, req, res, next) {
       error = duplicateKeyErrorHandler(error);
     }
 
-    // error thrown by  mongoose validator. Express validator thrown the error before in the route.
+    // error thrown by  Mongoose validator. Express validator thrown the error before in the route.
     if (error.name != undefined && error.name == "ValidationError") {
       error = validatorErrorHandler(error);
     }

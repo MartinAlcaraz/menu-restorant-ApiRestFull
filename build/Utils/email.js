@@ -1,12 +1,8 @@
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.transporter = void 0;
 var _nodemailer = _interopRequireDefault(require("nodemailer"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-// create a transporter
+// // create a transporter
 var transporter = _nodemailer["default"].createTransport({
   host: "smtp.gmail.com",
   port: 465,
@@ -14,18 +10,14 @@ var transporter = _nodemailer["default"].createTransport({
   auth: {
     user: process.env.USER_GOOGLE,
     pass: process.env.PASS_GOOGLE
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 });
-
-// const emailOptions = {
-//     from: "RestoMartinMenuOnline support<alcarazangelmartin@gmail.com>",
-//     to: option.email,
-//     subject: option.subject,
-//     text: option.message
-// }
-exports.transporter = transporter;
 transporter.verify().then(function () {
-  console.log("Nodemailer connnected.");
+  console.log("Nodemailer connected.");
+})["catch"](function (err) {
+  return console.log("*** Nodemailer not connected. ***");
 });
-
-// await transport.sendMail(emailOptions);
+module.exports = transporter;

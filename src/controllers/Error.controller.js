@@ -1,4 +1,4 @@
-// recive los errores que manda express, por medio del metodo next(error) (errores programados en controladores por ej.) ó 
+// recive los errores que manda express, por medio del metodo " next(error) " (errores programados en controladores por ej.) ó 
 // por otro metodo (por ej. los errores que manda mongoose))
 import CustomError from "../Utils/CustomError";
 
@@ -26,18 +26,20 @@ const castErrorHandler = (error)=>{
     return new CustomError(`Invalid value for ${error.path} : ${error.value}`, 400);   
 }
 
+//errores por nombres existentes en la BBDD.
 const duplicateKeyErrorHandler = (error)=>{
     return new CustomError(`The name ${error.keyValue.name} already exists. Use another name.`, 400);   
 }
 
+//Errores de Mongoose validator
 const validatorErrorHandler = (error)=>{
-
     const msg = Object.values(error.errors).map(val => val.message);
     const errorMsg = msg.join('. ');
     return new CustomError( "Validation errors. "+ errorMsg , 400);   
 }
 
 export default (error, req, res, next) => {
+
     error.statusCode = error.statusCode || 500;
     error.status = error.status || "error";
 
@@ -56,7 +58,7 @@ export default (error, req, res, next) => {
             error = duplicateKeyErrorHandler(error); 
         }
 
-        // error thrown by  mongoose validator. Express validator thrown the error before in the route.
+        // error thrown by  Mongoose validator. Express validator thrown the error before in the route.
         if(error.name != undefined && error.name == "ValidationError"){
             error = validatorErrorHandler(error);   
         }

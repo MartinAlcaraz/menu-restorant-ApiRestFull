@@ -85,10 +85,32 @@ authCtrl.logIn = (0, _asyncErrorHandler["default"])( /*#__PURE__*/function () {
     return _ref.apply(this, arguments);
   };
 }());
-authCtrl.logOut = /*#__PURE__*/function () {
+authCtrl.isLogged = (0, _asyncErrorHandler["default"])( /*#__PURE__*/function () {
   var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(req, res) {
     return _regeneratorRuntime().wrap(function _callee2$(_context2) {
       while (1) switch (_context2.prev = _context2.next) {
+        case 0:
+          res.status(200).json({
+            status: "OK",
+            message: "Successful login",
+            data: {
+              isLogged: true
+            }
+          });
+        case 1:
+        case "end":
+          return _context2.stop();
+      }
+    }, _callee2);
+  }));
+  return function (_x3, _x4) {
+    return _ref2.apply(this, arguments);
+  };
+}());
+authCtrl.logOut = /*#__PURE__*/function () {
+  var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(req, res) {
+    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      while (1) switch (_context3.prev = _context3.next) {
         case 0:
           res.clearCookie('access-token');
           res.status(200).json({
@@ -98,110 +120,26 @@ authCtrl.logOut = /*#__PURE__*/function () {
           });
         case 2:
         case "end":
-          return _context2.stop();
+          return _context3.stop();
       }
-    }, _callee2);
+    }, _callee3);
   }));
-  return function (_x3, _x4) {
-    return _ref2.apply(this, arguments);
+  return function (_x5, _x6) {
+    return _ref3.apply(this, arguments);
   };
 }();
 
 // send an email at the user to reset the password
 authCtrl.forgotPassword = /*#__PURE__*/function () {
-  var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(req, res, next) {
-    var user, resetToken, resetURL, message;
-    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-      while (1) switch (_context3.prev = _context3.next) {
-        case 0:
-          _context3.prev = 0;
-          _context3.next = 3;
-          return _User["default"].findOne({
-            email: req.body.email
-          });
-        case 3:
-          user = _context3.sent;
-          if (user) {
-            _context3.next = 6;
-            break;
-          }
-          return _context3.abrupt("return", res.status(404).json({
-            status: "FAILED",
-            message: "The user email does not exists."
-          }));
-        case 6:
-          // create token for reset password
-          resetToken = user.createResetPasswordToken();
-          _context3.next = 9;
-          return user.save({
-            validateBeforeSave: false
-          });
-        case 9:
-          // send Email
-          resetURL = "".concat(req.protocol, "://").concat(req.get('host'), "/api/auth/resetPassword/").concat(resetToken);
-          message = "We have recieved a password reset request. \n            Please use the link below to reset the password. \n\n ".concat(resetURL, " \n\n\n            This reset password link will be available only for 10 minutes.");
-          _context3.prev = 11;
-          _context3.next = 14;
-          return _email["default"].sendEmail({
-            from: "RestoMartinMenuOnline support<alcarazangelmartin@gmail.com>",
-            // to: user.email,
-            to: "martincho_cqc@hotmail.com",
-            subject: "Password reset request",
-            text: message,
-            html: "\n                <p>We have recieved a password reset request. Please use the link below to reset the password.</p>\n                <a href=\"".concat(resetURL, "\">Reset Password</a>\n                <p>This reset password link will be available only for 10 minutes.</p>\n                ")
-          });
-        case 14:
-          return _context3.abrupt("return", res.status(200).json({
-            status: "OK",
-            message: "Password reset link send to the user email."
-          }));
-        case 17:
-          _context3.prev = 17;
-          _context3.t0 = _context3["catch"](11);
-          user.passwordResetToken = undefined;
-          user.passwordResetExpires = undefined;
-          _context3.next = 23;
-          return user.save({
-            validateBeforeSave: false
-          });
-        case 23:
-          return _context3.abrupt("return", res.status(500).json({
-            status: "FAILED",
-            message: "There was a problem with the reset password email. Try again later."
-          }));
-        case 24:
-          _context3.next = 29;
-          break;
-        case 26:
-          _context3.prev = 26;
-          _context3.t1 = _context3["catch"](0);
-          return _context3.abrupt("return", res.status(500).json({
-            status: "FAILED",
-            message: "Error in password reset controller"
-          }));
-        case 29:
-        case "end":
-          return _context3.stop();
-      }
-    }, _callee3, null, [[0, 26], [11, 17]]);
-  }));
-  return function (_x5, _x6, _x7) {
-    return _ref3.apply(this, arguments);
-  };
-}();
-authCtrl.resetPassword = /*#__PURE__*/function () {
   var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(req, res, next) {
-    var encryptedToken, user;
+    var user, resetToken, resetURL, message, mailOptions;
     return _regeneratorRuntime().wrap(function _callee4$(_context4) {
       while (1) switch (_context4.prev = _context4.next) {
         case 0:
-          encryptedToken = _crypto["default"].createHash('sha256').update(req.params.resetToken).digest('hex');
+          _context4.prev = 0;
           _context4.next = 3;
           return _User["default"].findOne({
-            encryptedPasswordResetToken: encryptedToken,
-            passwordResetExpires: {
-              $gt: Date.now()
-            }
+            email: req.body.email
           });
         case 3:
           user = _context4.sent;
@@ -209,19 +147,105 @@ authCtrl.resetPassword = /*#__PURE__*/function () {
             _context4.next = 6;
             break;
           }
-          return _context4.abrupt("return", res.status(401).json({
+          return _context4.abrupt("return", res.status(404).json({
+            status: "FAILED",
+            message: "The user email does not exists."
+          }));
+        case 6:
+          // create token for reset password
+          resetToken = user.createResetPasswordToken();
+          _context4.next = 9;
+          return user.save({
+            validateBeforeSave: false
+          });
+        case 9:
+          //    send Email      //
+          resetURL = "".concat(req.protocol, "://").concat(req.get('host'), "/api/auth/resetPassword/").concat(resetToken);
+          message = "We have recieved a password reset request. \n            Please use the link below to reset the password. \n\n ".concat(resetURL, " \n\n\n            This reset password link will be available only for 10 minutes.");
+          _context4.prev = 11;
+          mailOptions = {
+            from: "RestoMartinMenuOnline support<alcarazangelmartin@gmail.com>",
+            // to: user.email, // <====
+            to: "martincho_cqc@hotmail.com",
+            subject: "Password reset request",
+            text: message,
+            html: "\n                    <p>We have recieved a password reset request. Please use the link below to reset the password.</p>\n                    <a href=\"".concat(resetURL, "\">Reset Password</a>\n                    <p>This reset password link will be available only for 10 minutes.</p>\n                    ")
+          };
+          _context4.next = 15;
+          return _email["default"].sendMail(mailOptions);
+        case 15:
+          return _context4.abrupt("return", res.status(200).json({
+            status: "OK",
+            message: "Password reset link send to the user email."
+          }));
+        case 18:
+          _context4.prev = 18;
+          _context4.t0 = _context4["catch"](11);
+          user.passwordResetToken = undefined;
+          user.passwordResetExpires = undefined;
+          _context4.next = 24;
+          return user.save({
+            validateBeforeSave: false
+          });
+        case 24:
+          console.log("err", _context4.t0);
+          return _context4.abrupt("return", res.status(500).json({
+            status: "FAILED",
+            message: "There was a problem with the reset password email. Try again later."
+          }));
+        case 26:
+          _context4.next = 31;
+          break;
+        case 28:
+          _context4.prev = 28;
+          _context4.t1 = _context4["catch"](0);
+          return _context4.abrupt("return", res.status(500).json({
+            status: "FAILED",
+            message: "Error in password reset controller"
+          }));
+        case 31:
+        case "end":
+          return _context4.stop();
+      }
+    }, _callee4, null, [[0, 28], [11, 18]]);
+  }));
+  return function (_x7, _x8, _x9) {
+    return _ref4.apply(this, arguments);
+  };
+}();
+authCtrl.resetPassword = /*#__PURE__*/function () {
+  var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5(req, res, next) {
+    var encryptedToken, user;
+    return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+      while (1) switch (_context5.prev = _context5.next) {
+        case 0:
+          encryptedToken = _crypto["default"].createHash('sha256').update(req.params.resetToken).digest('hex');
+          _context5.next = 3;
+          return _User["default"].findOne({
+            encryptedPasswordResetToken: encryptedToken,
+            passwordResetExpires: {
+              $gt: Date.now()
+            }
+          });
+        case 3:
+          user = _context5.sent;
+          if (user) {
+            _context5.next = 6;
+            break;
+          }
+          return _context5.abrupt("return", res.status(401).json({
             status: "FAILED",
             message: "The token is invalid or has expired."
           }));
         case 6:
-          _context4.next = 8;
+          _context5.next = 8;
           return _User["default"].encryptPassword(req.body.newPassword);
         case 8:
-          user.password = _context4.sent;
+          user.password = _context5.sent;
           user.encryptedPasswordResetToken = undefined;
           user.passwordResetExpires = undefined;
           user.passwordChangedAt = Date.now();
-          _context4.next = 14;
+          _context5.next = 14;
           return user.save();
         case 14:
           res.status(200).json({
@@ -230,12 +254,12 @@ authCtrl.resetPassword = /*#__PURE__*/function () {
           });
         case 15:
         case "end":
-          return _context4.stop();
+          return _context5.stop();
       }
-    }, _callee4);
+    }, _callee5);
   }));
-  return function (_x8, _x9, _x10) {
-    return _ref4.apply(this, arguments);
+  return function (_x10, _x11, _x12) {
+    return _ref5.apply(this, arguments);
   };
 }();
 var _default = authCtrl;

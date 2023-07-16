@@ -10,8 +10,14 @@ var validateResult = function validateResult(req, res, next) {
     (0, _expressValidator.validationResult)(req)["throw"]();
     next();
   } catch (err) {
+    var msg = err.errors.map(function (val) {
+      return val.msg;
+    });
+    var errorMsg = msg.join('. ');
     res.status(403).json({
-      errors: err.array()
+      status: "FAILED",
+      message: errorMsg,
+      details: err.errors
     });
   }
 };

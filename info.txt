@@ -36,8 +36,8 @@ access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MzAyNGVjMzRiNzdjZG
 .get('/products/category/:categoryName') => retorna todos los productos de la categoria pasada como parametro
 
 .post('/products/') => crea nuevo producto
-.get('/products/:productId') => actualiza el producto
-.put('/products/:productId') => crea nuevo producto
+.get('/products/:productId') => obtiene el producto
+.put('/products/:productId') => actualiza producto
 .delete('/products/:productId') => elimina el producto
 
 .get('/products/stats') => retorna las estadisticas de los productos

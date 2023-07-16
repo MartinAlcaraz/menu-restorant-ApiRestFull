@@ -38,6 +38,8 @@ productsCtrl.queryBestProducts = (0, _asyncErrorHandler["default"])( /*#__PURE__
     return _ref.apply(this, arguments);
   };
 }());
+
+// retorna los productos de la categoria pasada por id
 productsCtrl.getProductsOfCategory = (0, _asyncErrorHandler["default"])( /*#__PURE__*/function () {
   var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(req, res, next) {
     var category, err, products, result;

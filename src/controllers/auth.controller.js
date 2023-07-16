@@ -38,6 +38,13 @@ authCtrl.logIn = asyncErrorHandler(async (req, res) => {
 
 });
 
+authCtrl.isLogged = asyncErrorHandler(async (req, res) => {
+    
+    res.status(200).json({ status: "OK", message: "Successful login", data: {isLogged: true} });
+});
+
+
+
 authCtrl.logOut = async (req, res) => {
 
     res.clearCookie('access-token')

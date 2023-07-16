@@ -14,6 +14,6 @@ const transporter = nodemailer.createTransport({
 
 transporter.verify().then(() => {
     console.log("Nodemailer connected.")
-});
+}).catch(err=> console.log("*** Nodemailer not connected. ***"));
 
 module.exports = transporter;

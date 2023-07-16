@@ -54,7 +54,7 @@ productsCtrl.getProducts = asyncErrorHandler(async (req, res, next) => {
     let result= {};
 
     if (Object.keys(req.query).length > 0) {
-
+        // ApiFeatures => clase que recive las query del frontend y retorna un objeto query entendible para mongoose
         let features = await new ApiFeatures(Product.find(), req.query).filter().sort().limitFields().pagination();
         result = await features.query;
 

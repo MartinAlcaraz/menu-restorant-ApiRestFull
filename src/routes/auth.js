@@ -6,6 +6,7 @@ import { verifyToken } from "../middlewares/auth.js";
 const router = express.Router();
 
 router.post('/login', validateSingIn, authCtrl.logIn)
+    .get('/isLogged', verifyToken, authCtrl.isLogged)
     .post('/logout', verifyToken, authCtrl.logOut)
     .post('/forgotPassword', validateForgotPassword, authCtrl.forgotPassword)
     .patch('/resetPassword/:resetToken', validateResetPassword, authCtrl.resetPassword)
