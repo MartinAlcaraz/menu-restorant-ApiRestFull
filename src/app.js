@@ -12,10 +12,20 @@ const app = express();
 createRolesInDB();
 
 // app.use(cors({
-//     origin: "http://localhost:5000"  // location of the react app were connecting to
-//     // credentials: true  // cuando usar??
+//     origin: "http://localhost:5173"  // location of the react app were connecting to
+//     // credentials: true  // cuando usar?? para enviar las cookies?
 // }));
-app.use(cors());
+
+// app.use(cors());
+
+app.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', req.headers.origin);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+    next();
+});
+
 app.use(cookieParser());
 app.use(morgan("dev")); // imprime las solicitudes http en consola
 app.use(express.json());
