@@ -20,19 +20,21 @@ authCtrl.logIn = asyncErrorHandler(async (req, res) => {
     if (!validPassword) {
         return res.status(401).json({ status: "FAILED", message: "Invalid email or password" });
     }
-    // (user id , expiration in seconds);
-    const token = createToken(foundUser._id, 3600);
-
+    // (user id , expiration in seconds); 1hour == 3600 seconds
+    const token = createToken(foundUser._id, 3600); 
+    
     const rolAdmin = await Rol.findOne({ name: "admin" });
 
     const user = {
         username: foundUser.username,
         isAdmin: foundUser.roles.includes(rolAdmin._id)
     }
+
     res.cookie('access-token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV == "production",
-        maxAge: 3600 * 1000 // 60 minutos en milisegundos
+        sameSite: 'none' ,
+        secure: process.env.NODE_ENV == "production", // true if production
+        maxAge: 3600 * 1000, // 60 minutos en milisegundos
     })
         .status(200).json({ status: "OK", message: "Successful login", data: { user } });
 
