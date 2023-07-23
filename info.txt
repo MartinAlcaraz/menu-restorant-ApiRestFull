@@ -31,7 +31,8 @@ access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MzAyNGVjMzRiNzdjZG
 
 .get('/products?search=value') => retorna resultado para nombre de producto == value
 
-.get('/products?query=value') => retorna query  e.g. .get(http://localhost:5000/api/products?price[gte]=1.5&sort=price&fields=name,price,-description,-createdAt&page=2&limit=10)
+.get('/products?query=value') => retorna query  e.g. .get(http://localhost:5000/api/products?price[gte]=1.5&sort=price&fields=name,price,-description,-createdAt&page=1&limit=10)
+
 
 .get('/products/category/:categoryName') => retorna todos los productos de la categoria pasada como parametro
 

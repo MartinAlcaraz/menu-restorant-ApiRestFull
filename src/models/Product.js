@@ -13,7 +13,7 @@ const productSchema = new Schema({
     },
     imgURL: { type: String, required: true },
     price: { type: Number, required: true, min: 0, max: 1000 },
-    description: { type: String, trim: true },
+    description: { type: String, trim: true, min: 0, max : 500 },
     createdBy: { type: String, default: "A. Martin Alcaraz" }
 }, {
     timestamps: true,

@@ -13,6 +13,11 @@ const validateCreateProduct = [
         .isString()
         .isLength({ min: 3, max: 30 }),
 
+    body('description')
+        .exists()
+        .isString()
+        .isLength({ min: 3, max: 500 }).withMessage('The description must be less than 500 characters.'),
+
     body('imgURL')
         .exists()
         .isString()
@@ -57,7 +62,12 @@ const validateUpdateProduct = [
     body('name')
         .exists()
         .isString()
-        .isLength({ min: 3, max: 50 }),
+        .isLength({ min: 3, max: 30 }),
+
+    body('description')
+        .exists()
+        .isString()
+        .isLength({ min: 3, max: 500 }).withMessage('The description must be less than 500 characters.'),
 
     body('imgURL')
         .exists()
@@ -111,7 +121,7 @@ const validateSearchProduct = [
     query('name')
         .exists().withMessage("Query 'name' must exists.")
         .isString()
-        .isLength({ min: 1, max: 20 }).withMessage("The name must be greater than 1 and less than 20 characters."),
+        .isLength({ min: 1, max: 30 }).withMessage("The name must be greater than 1 and less than 30 characters."),
 
     (req, res, next) => {
         validateResult(req, res, next);
