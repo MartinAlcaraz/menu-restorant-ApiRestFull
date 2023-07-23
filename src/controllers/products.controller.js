@@ -114,11 +114,11 @@ productsCtrl.getStats = asyncErrorHandler(async (req, res, next) => {
 
 productsCtrl.postProduct = asyncErrorHandler(async (req, res, next) => {
 
-    const { name, categoryId, price, imgURL } = req.body;
+    const { name, categoryId, description, price, imgURL } = req.body;
 
     const nameExists = await Product.findOne({ name: name });
     if (nameExists) {
-        const err = new CustomError(`A product with the name '${name}' already exists.`, 400);
+        const err = new CustomError(`A product with the name '${name}' already exists.`, 409);
         return next(err);
     }
 
@@ -127,7 +127,7 @@ productsCtrl.postProduct = asyncErrorHandler(async (req, res, next) => {
         const err = new CustomError("The category does not exists.", 400);
         return next(err);
     }
-    const productSaved = await Product.create({ name, price, imgURL, category: categoryId });
+    const productSaved = await Product.create({ name, price, description, imgURL, category: categoryId });
 
     if (!productSaved) {
         const err = new CustomError("Could not save the product", 400);
@@ -142,6 +142,12 @@ productsCtrl.updateProduct = asyncErrorHandler(async (req, res, next) => {
     const product = await Product.findById(req.params.productId);
     if (!product) {
         const err = new CustomError("The product does not exists", 404);
+        return next(err);
+    }
+
+    const nameExists = await Product.findOne({ name: req.body.name });
+    if (nameExists) {
+        const err = new CustomError(`A product with the name '${name}' already exists.`, 409);
         return next(err);
     }
 
