@@ -16,12 +16,17 @@ const validateCreateProduct = [
     body('description')
         .exists()
         .isString()
-        .isLength({ min: 3, max: 500 }).withMessage('The description must be less than 500 characters.'),
+        .isLength({ min: 3, max: 500 }).withMessage('The description must be greater than 3 and less than 500 characters.'),
 
-    body('imgURL')
-        .exists()
-        .isString()
-        .isLength({ min: 10, max: 100 }),
+    body('image')
+        // .exists().withMessage("Param image must exist")
+        .custom((value, { req }) => {
+            if ( ["image/jpg", "image/jpeg", "image/png"].includes(req.file.mimetype)) {
+                return true; // return  to indicate valid data"
+            } else {
+                return false; // return to indicate invalid data
+            }
+        }).withMessage('Please only submit image files.'), // custom error message that will be send back if the file in not a pdf. 
 
     body('price')
         .exists()

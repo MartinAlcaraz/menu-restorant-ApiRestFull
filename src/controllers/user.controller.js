@@ -92,10 +92,11 @@ userCtrl.createUser = asyncErrorHandler(async (req, res, next) => {
     const { username, email, password, roles } = req.body;
 
     const userFound = await User.find({ $or: [{ username }, { email }] });
+    // const userFound = await User.find({ email });
 
     // comprueba si ya existe un usuario con el username ó email ingresado
     if (userFound.length > 0) {
-        const err = new CustomError("username or email already taken.", 400);
+        const err = new CustomError("The username or email alredy exists, use another.", 409);
         return next(err);
     }
 

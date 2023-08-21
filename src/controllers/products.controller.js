@@ -3,6 +3,25 @@ import Product from "../models/Product";
 import ApiFeatures from "../Utils/ApiFeatures";
 import CustomError from "../Utils/CustomError";
 import asyncErrorHandler from "../Utils/asyncErrorHandler";
+import fs from 'fs';
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+function deleteImage(imagePath) {
+    // se borra la imagen guardada en public/uploads/ --> (req.file)
+    try {
+        fs.unlinkSync(imagePath);
+        console.log('Imagen de /uploads eliminada');
+
+    } catch {
+        console.log('no se pudo borrar la imagen de /uploads')
+    }
+}
 
 const productsCtrl = {};
 
@@ -18,19 +37,27 @@ productsCtrl.queryBestProducts = asyncErrorHandler(async (req, res, next) => {
 // retorna los productos de la categoria pasada por id
 productsCtrl.getProductsOfCategory = asyncErrorHandler(async (req, res, next) => {
 
-    const category = await Category.findOne({name: {$regex: `^${req.params.categoryName}$` , $options: 'i'}});
+    const category = await Category.findOne({ name: { $regex: `^${req.params.categoryName}$`, $options: 'i' } });
 
-    if (!category){
-        const err = new CustomError("The category name '"+req.params.categoryName+"' does not exists.", 400);
+    if (!category) {
+        const err = new CustomError("The category name '" + req.params.categoryName + "' does not exists.", 400);
         return next(err);
     }
 
-    const products = await Product.find({ category: category._id });
+    let products = {};
+
+    if (Object.keys(req.query).length > 0) {
+        // ApiFeatures => clase que recive las query del frontend y retorna un objeto query entendible para mongoose
+        let features = await new ApiFeatures(Product.find({ category: category._id }), req.query).filter().sort().limitFields();
+        products = await features.query;
+
+    } else {  // consulta sin query
+        products = await Product.find({ category: category._id });
+    } 
 
     const result = await Category.populate(products, { path: "category", select: "name" });
 
     res.status(200).json({ status: 'OK', length: products.length, data: { products: result } });
-
 });
 
 
@@ -51,14 +78,14 @@ productsCtrl.searchProducts = asyncErrorHandler(async (req, res, next) => {
 
 productsCtrl.getProducts = asyncErrorHandler(async (req, res, next) => {
 
-    let result= {};
+    let result = {};
 
     if (Object.keys(req.query).length > 0) {
         // ApiFeatures => clase que recive las query del frontend y retorna un objeto query entendible para mongoose
         let features = await new ApiFeatures(Product.find(), req.query).filter().sort().limitFields().pagination();
         result = await features.query;
 
-    }else{
+    } else {
         result = await Product.find();
     }
 
@@ -114,27 +141,48 @@ productsCtrl.getStats = asyncErrorHandler(async (req, res, next) => {
 
 productsCtrl.postProduct = asyncErrorHandler(async (req, res, next) => {
 
-    const { name, categoryId, description, price, imgURL } = req.body;
+    const { name, categoryId, description, price } = req.body;
+    const image = await req.file;
 
     const nameExists = await Product.findOne({ name: name });
     if (nameExists) {
+        deleteImage(image.path);
         const err = new CustomError(`A product with the name '${name}' already exists.`, 409);
         return next(err);
     }
 
     const categoryExists = await Category.findById(categoryId);
     if (!categoryExists) {
+        deleteImage(image.path);
         const err = new CustomError("The category does not exists.", 400);
         return next(err);
     }
-    const productSaved = await Product.create({ name, price, description, imgURL, category: categoryId });
+
+    if (!image) {
+        deleteImage(image.path);
+        const err = new CustomError("Problem with image, not founded.", 400);
+        return next(err);
+    }
+
+    let imageName = image.filename.slice(0, image.filename.lastIndexOf('.'));
+    //subir la imagen a cloudinary
+    let cloudResult = await cloudinary.uploader.upload(
+        image.path,     // direccion de la imagen subida y guardada en /public/uploads por multer
+        {
+            public_id: imageName,
+            upload_preset: "pictures_preset"
+        }
+    )
+    deleteImage(image.path);
+
+    const productSaved = await Product.create({ name, price, description, imgURL: cloudResult.secure_url, category: categoryId });
 
     if (!productSaved) {
         const err = new CustomError("Could not save the product", 400);
         return next(err);
     }
 
-    res.status(201).json({ status: 'OK', data: 'Product created ' });
+    res.status(201).json({ status: 'OK', message: 'Product created.' });
 });
 
 productsCtrl.updateProduct = asyncErrorHandler(async (req, res, next) => {

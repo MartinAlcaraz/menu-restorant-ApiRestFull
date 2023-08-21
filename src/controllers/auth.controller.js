@@ -33,7 +33,7 @@ authCtrl.logIn = asyncErrorHandler(async (req, res) => {
     res.cookie('access-token', token, {
         httpOnly: true,
         sameSite: 'none' ,
-        secure: process.env.NODE_ENV == "production", // true if production
+        secure: "true", //process.env.NODE_ENV == "production", // for cookies enables in client side
         maxAge: 3600 * 1000, // 60 minutos en milisegundos
     })
         .status(200).json({ status: "OK", message: "Successful login", data: { user } });

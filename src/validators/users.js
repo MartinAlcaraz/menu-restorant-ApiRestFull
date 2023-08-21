@@ -13,12 +13,12 @@ const validateUpdateUser = [
     body('password')
         .exists().withMessage('Ingrese el campo password')
         .isString().withMessage('password debe ser un tipo de dato string')
-        .isLength({ min: 3, max: 10 }).withMessage('password debe tener de 3 a 10 caracteres.'),
+        .isLength({ min: 4, max: 10 }).withMessage('password debe tener de 4 a 10 caracteres.'),
 
     body('newPassword')
         .exists().withMessage('Ingrese el campo newPassword')
         .isString().withMessage('newPassword debe ser un tipo de dato string')
-        .isLength({ min: 3, max: 10 }).withMessage('newPassword debe tener de 3 a 10 caracteres.'),
+        .isLength({ min: 4, max: 10 }).withMessage('newPassword debe tener de 4 a 10 caracteres.'),
 
     (req, res, next) => {
         validateResult(req, res, next);
@@ -55,7 +55,7 @@ const validateCreateUser = [
     body('password')
         .exists().withMessage('Ingrese el campo password')
         .isString().withMessage('password debe ser un tipo de dato string')
-        .isLength({ min: 3, max: 10 }).withMessage('password debe tener de 3 a 10 caracteres.'),
+        .isLength({ min: 4, max: 10 }).withMessage('password debe tener de 4 a 10 caracteres.'),
 
     body("roles")
         .isArray({ min: 0, max: 3 }).withMessage('el campo roles debe ser un array[] y debe tener como maximo 3 items.'),
