@@ -19,7 +19,7 @@ function deleteImage(imagePath) {
         console.log('Imagen de /uploads eliminada');
 
     } catch {
-        console.log('no se pudo borrar la imagen de /uploads')
+        console.log('No se pudo borrar la imagen de /uploads')
     }
 }
 
@@ -53,7 +53,7 @@ productsCtrl.getProductsOfCategory = asyncErrorHandler(async (req, res, next) =>
 
     } else {  // consulta sin query
         products = await Product.find({ category: category._id });
-    } 
+    }
 
     const result = await Category.populate(products, { path: "category", select: "name" });
 
@@ -142,21 +142,20 @@ productsCtrl.getStats = asyncErrorHandler(async (req, res, next) => {
 productsCtrl.postProduct = asyncErrorHandler(async (req, res, next) => {
 
     const { name, categoryId, description, price } = req.body;
-    const image = await req.file;
 
     const nameExists = await Product.findOne({ name: name });
     if (nameExists) {
-        deleteImage(image.path);
         const err = new CustomError(`A product with the name '${name}' already exists.`, 409);
         return next(err);
     }
 
     const categoryExists = await Category.findById(categoryId);
     if (!categoryExists) {
-        deleteImage(image.path);
         const err = new CustomError("The category does not exists.", 400);
         return next(err);
     }
+
+    const image = await req.file;
 
     if (!image) {
         deleteImage(image.path);
@@ -170,12 +169,12 @@ productsCtrl.postProduct = asyncErrorHandler(async (req, res, next) => {
         image.path,     // direccion de la imagen subida y guardada en /public/uploads por multer
         {
             public_id: imageName,
-            upload_preset: "pictures_preset"
+            upload_preset: "resto_vladimir"
         }
     )
     deleteImage(image.path);
 
-    const productSaved = await Product.create({ name, price, description, imgURL: cloudResult.secure_url, category: categoryId });
+    const productSaved = await Product.create({ name, price, description, imgURL: cloudResult.secure_url, img_public_id: cloudResult.public_id, category: categoryId });
 
     if (!productSaved) {
         const err = new CustomError("Could not save the product", 400);
@@ -187,23 +186,59 @@ productsCtrl.postProduct = asyncErrorHandler(async (req, res, next) => {
 
 productsCtrl.updateProduct = asyncErrorHandler(async (req, res, next) => {
 
-    const product = await Product.findById(req.params.productId);
+    const productId = req.params.productId;
+
+    const product = await Product.findById(productId);
     if (!product) {
-        const err = new CustomError("The product does not exists", 404);
+        const err = new CustomError("The product you want to update does not exist", 404);
         return next(err);
     }
 
-    const nameExists = await Product.findOne({ name: req.body.name });
+    // no se permite tener 2 productos con el mismo nombre.
+    // if(name == product.name && id != product.id) { es porque otro producto ya tiene el mismo nombre }
+
+    const nameExists = await Product.findOne({ $and: [{ name: req.body.name }, { _id: { $ne: productId } }] }); // $ne = not equal
     if (nameExists) {
-        const err = new CustomError(`A product with the name '${name}' already exists.`, 409);
+        const err = new CustomError(`A product with the name '${req.body.name}' already exists.`, 409);
         return next(err);
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(req.params.productId,
+    const categoryExists = await Category.findById(req.body.categoryId);
+    if (!categoryExists) {
+        const err = new CustomError("The category does not exists.", 400);
+        return next(err);
+    }
+
+    const image = await req.file;
+
+    let newImgURL = null;
+    let newImg_public_id = null;
+    if (image != undefined) {
+        let imageName = image.filename.slice(0, image.filename.lastIndexOf('.'));
+        //subir la imagen a cloudinary
+        let cloudResult = await cloudinary.uploader.upload(
+            image.path,     // direccion de la imagen subida y guardada en /public/uploads por multer
+            {
+                public_id: imageName,
+                upload_preset: "resto_vladimir"
+            }
+        )
+        newImgURL = cloudResult.secure_url;
+        newImg_public_id = cloudResult.public_id;
+        deleteImage(image.path);
+
+        //     Delete old image from cloudinary    //
+        cloudinary.uploader.destroy(product.img_public_id);
+    }
+    
+    const updatedProduct = await Product.findByIdAndUpdate(productId,
         {
             name: req.body.name,
-            imgURL: req.body.imgURL,
-            price: req.body.price
+            imgURL: newImgURL == null?  undefined : newImgURL, // if undefined, value doesn't change
+            img_public_id: newImg_public_id == null ? undefined : newImg_public_id, 
+            price: req.body.price,
+            category: req.body.categoryId,
+            description: req.body.description
         },
         {
             runValidators: true,  // => para que se ejecuten los validadores del esquema de mongoose
@@ -215,7 +250,7 @@ productsCtrl.updateProduct = asyncErrorHandler(async (req, res, next) => {
         return next(err);
     }
 
-    res.status(200).json({ status: 'OK', data: "The product " + updatedProduct.name + " was updated." });
+    res.status(200).json({ status: 'OK', message: "The product " + updatedProduct.name + " was updated." });
 
 });
 
@@ -234,6 +269,7 @@ productsCtrl.deleteProduct = asyncErrorHandler(async (req, res, next) => {
         const err = new CustomError("Could not delete the product.", 400);
         return next(err);
     }
+
     res.status(200).json({ status: 'OK', message: "The product " + productDeleted.name + " was successfully deleted" });
 
 });

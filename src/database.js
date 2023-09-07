@@ -5,7 +5,9 @@ let mongodb_uri;
 
 if(process.env.NODE_ENV == "development") {
     dotenv.config();
-    mongodb_uri = "mongodb://localhost/TiendaDB";
+    // mongodb_uri = "mongodb://localhost/RestorantVladimir";
+    mongodb_uri = process.env.MONGO_DB_URI_LOCAL;
+
 }else{
     // dotenv.config(); // borrar 
     mongodb_uri= process.env.MONGO_DB_URI;

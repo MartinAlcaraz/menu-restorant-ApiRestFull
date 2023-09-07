@@ -12,6 +12,7 @@ const productSchema = new Schema({
         required: true
     },
     imgURL: { type: String, required: true },
+    img_public_id: { type: String, required: true },
     price: { type: Number, required: true, min: 0, max: 1000 },
     description: { type: String, trim: true, min: 0, max : 500 },
     createdBy: { type: String, default: "A. Martin Alcaraz" }
@@ -23,9 +24,9 @@ const productSchema = new Schema({
 // Document Middleware:
 // function executed before .save() or .create() methods in product.controller, executed before the document is saved in DDBB
 productSchema.pre('save', function (next) {
-    this.description = `Delicious ${this.name}`;
-    console.log('document middleware in save or create method');
-    next();
+    // this.description = `Delicious ${this.name}`;
+    // console.log('document middleware in save or create method');
+    // next();
 });
 
 // execute after the document has been created with save or create methods.

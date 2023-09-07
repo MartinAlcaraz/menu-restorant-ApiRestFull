@@ -21,12 +21,12 @@ const validateCreateProduct = [
     body('image')
         // .exists().withMessage("Param image must exist")
         .custom((value, { req }) => {
-            if ( ["image/jpg", "image/jpeg", "image/png"].includes(req.file.mimetype)) {
-                return true; // return  to indicate valid data"
+            if (["image/jpg", "image/jpeg", "image/png"].includes(req.file.mimetype)) {
+                return true; // return  to indicate valid data
             } else {
                 return false; // return to indicate invalid data
             }
-        }).withMessage('Please only submit image files.'), // custom error message that will be send back if the file in not a pdf. 
+        }).withMessage('Please only submit image files.'), // custom error message that will be send back if the file in not an image. 
 
     body('price')
         .exists()
@@ -74,10 +74,18 @@ const validateUpdateProduct = [
         .isString()
         .isLength({ min: 3, max: 500 }).withMessage('The description must be less than 500 characters.'),
 
-    body('imgURL')
-        .exists()
-        .isString()
-        .isLength({ min: 10, max: 100 }),
+    body('image')
+        .custom((value, { req }) => {
+            if (!req.file) {    // si no existe un archivo se prosigue. 
+                return true;
+            }
+            // si existe se valida.
+            if (["image/jpg", "image/jpeg", "image/png"].includes(req.file.mimetype)) {
+                return true; // return  to indicate valid data
+            } else {
+                return false; // return to indicate invalid data
+            }
+        }).withMessage('Please only submit image files.'), // custom error message that will be send back if the file in not an image. 
 
     body('price')
         .exists()
