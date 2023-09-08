@@ -26,7 +26,7 @@ const productSchema = new Schema({
 productSchema.pre('save', function (next) {
     // this.description = `Delicious ${this.name}`;
     // console.log('document middleware in save or create method');
-    // next();
+    next();
 });
 
 // execute after the document has been created with save or create methods.

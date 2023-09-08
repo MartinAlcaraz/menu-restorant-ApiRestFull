@@ -171,6 +171,7 @@ productsCtrl.postProduct = asyncErrorHandler(async (req, res, next) => {
             upload_preset: "resto_vladimir"
         }
     )
+    
     deleteImage(image.path);
 
     const productSaved = await Product.create({ name, price, description, imgURL: cloudResult.secure_url, img_public_id: cloudResult.public_id, category: categoryId });
