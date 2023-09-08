@@ -158,8 +158,7 @@ productsCtrl.postProduct = asyncErrorHandler(async (req, res, next) => {
     const image = await req.file;
 
     if (!image) {
-        deleteImage(image.path);
-        const err = new CustomError("Problem with image, not founded.", 400);
+        const err = new CustomError("Problem with the image, not found.", 400);
         return next(err);
     }
 
